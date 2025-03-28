@@ -54,6 +54,7 @@ namespace CS2FM
             this.resetfontbtn = new System.Windows.Forms.Button();
             this.downbtn = new System.Windows.Forms.Button();
             this.upbtn = new System.Windows.Forms.Button();
+            this.previewfontbtn = new System.Windows.Forms.Button();
             this.directorygroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.sliderFontSize)).BeginInit();
             this.SuspendLayout();
@@ -85,13 +86,13 @@ namespace CS2FM
             this.fontlist.HorizontalScrollbar = true;
             this.fontlist.Location = new System.Drawing.Point(14, 12);
             this.fontlist.Name = "fontlist";
-            this.fontlist.Size = new System.Drawing.Size(124, 160);
+            this.fontlist.Size = new System.Drawing.Size(124, 173);
             this.fontlist.TabIndex = 5;
             this.fontlist.SelectedIndexChanged += new System.EventHandler(this.fontlist_SelectedIndexChanged);
             // 
             // addfontbtn
             // 
-            this.addfontbtn.Location = new System.Drawing.Point(12, 178);
+            this.addfontbtn.Location = new System.Drawing.Point(13, 198);
             this.addfontbtn.Name = "addfontbtn";
             this.addfontbtn.Size = new System.Drawing.Size(39, 20);
             this.addfontbtn.TabIndex = 6;
@@ -101,7 +102,7 @@ namespace CS2FM
             // 
             // removefontbtn
             // 
-            this.removefontbtn.Location = new System.Drawing.Point(51, 178);
+            this.removefontbtn.Location = new System.Drawing.Point(52, 198);
             this.removefontbtn.Name = "removefontbtn";
             this.removefontbtn.Size = new System.Drawing.Size(39, 20);
             this.removefontbtn.TabIndex = 7;
@@ -111,7 +112,7 @@ namespace CS2FM
             // 
             // applyfontbtn
             // 
-            this.applyfontbtn.Location = new System.Drawing.Point(12, 421);
+            this.applyfontbtn.Location = new System.Drawing.Point(12, 336);
             this.applyfontbtn.Name = "applyfontbtn";
             this.applyfontbtn.Size = new System.Drawing.Size(315, 28);
             this.applyfontbtn.TabIndex = 8;
@@ -208,25 +209,25 @@ namespace CS2FM
             // 
             // fontPreviewTextBox
             // 
-            this.fontPreviewTextBox.BackColor = System.Drawing.SystemColors.Control;
-            this.fontPreviewTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.fontPreviewTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.fontPreviewTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.fontPreviewTextBox.Location = new System.Drawing.Point(14, 268);
+            this.fontPreviewTextBox.Location = new System.Drawing.Point(345, 22);
             this.fontPreviewTextBox.Multiline = true;
             this.fontPreviewTextBox.Name = "fontPreviewTextBox";
             this.fontPreviewTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.fontPreviewTextBox.Size = new System.Drawing.Size(313, 113);
+            this.fontPreviewTextBox.Size = new System.Drawing.Size(250, 196);
             this.fontPreviewTextBox.TabIndex = 13;
             this.fontPreviewTextBox.Text = "The quick brown fox jumps over the lazy dog.";
+            this.fontPreviewTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.fontPreviewTextBox_KeyPress);
             // 
             // sliderFontSize
             // 
             this.sliderFontSize.LargeChange = 50;
-            this.sliderFontSize.Location = new System.Drawing.Point(12, 204);
+            this.sliderFontSize.Location = new System.Drawing.Point(333, 285);
             this.sliderFontSize.Maximum = 300;
             this.sliderFontSize.Minimum = 25;
             this.sliderFontSize.Name = "sliderFontSize";
-            this.sliderFontSize.Size = new System.Drawing.Size(126, 45);
+            this.sliderFontSize.Size = new System.Drawing.Size(271, 45);
             this.sliderFontSize.SmallChange = 25;
             this.sliderFontSize.TabIndex = 14;
             this.sliderFontSize.Value = 100;
@@ -235,7 +236,7 @@ namespace CS2FM
             // fontSizeLabel
             // 
             this.fontSizeLabel.AutoSize = true;
-            this.fontSizeLabel.Location = new System.Drawing.Point(12, 237);
+            this.fontSizeLabel.Location = new System.Drawing.Point(342, 268);
             this.fontSizeLabel.Name = "fontSizeLabel";
             this.fontSizeLabel.Size = new System.Drawing.Size(25, 13);
             this.fontSizeLabel.TabIndex = 15;
@@ -243,7 +244,7 @@ namespace CS2FM
             // 
             // resetfontbtn
             // 
-            this.resetfontbtn.Location = new System.Drawing.Point(12, 387);
+            this.resetfontbtn.Location = new System.Drawing.Point(12, 302);
             this.resetfontbtn.Name = "resetfontbtn";
             this.resetfontbtn.Size = new System.Drawing.Size(315, 28);
             this.resetfontbtn.TabIndex = 16;
@@ -254,7 +255,7 @@ namespace CS2FM
             // downbtn
             // 
             this.downbtn.Image = global::CS2FM.Properties.Resources.bullet_arrow_down;
-            this.downbtn.Location = new System.Drawing.Point(117, 178);
+            this.downbtn.Location = new System.Drawing.Point(118, 198);
             this.downbtn.Name = "downbtn";
             this.downbtn.Size = new System.Drawing.Size(21, 20);
             this.downbtn.TabIndex = 11;
@@ -264,18 +265,29 @@ namespace CS2FM
             // upbtn
             // 
             this.upbtn.Image = global::CS2FM.Properties.Resources.bullet_arrow_up;
-            this.upbtn.Location = new System.Drawing.Point(96, 178);
+            this.upbtn.Location = new System.Drawing.Point(97, 198);
             this.upbtn.Name = "upbtn";
             this.upbtn.Size = new System.Drawing.Size(21, 20);
             this.upbtn.TabIndex = 10;
             this.upbtn.UseVisualStyleBackColor = true;
             this.upbtn.Click += new System.EventHandler(this.upbtn_Click);
             // 
+            // previewfontbtn
+            // 
+            this.previewfontbtn.Location = new System.Drawing.Point(12, 268);
+            this.previewfontbtn.Name = "previewfontbtn";
+            this.previewfontbtn.Size = new System.Drawing.Size(315, 28);
+            this.previewfontbtn.TabIndex = 17;
+            this.previewfontbtn.Text = "Preview";
+            this.previewfontbtn.UseVisualStyleBackColor = true;
+            this.previewfontbtn.Click += new System.EventHandler(this.previewfontbtn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(333, 458);
+            this.ClientSize = new System.Drawing.Size(616, 376);
+            this.Controls.Add(this.previewfontbtn);
             this.Controls.Add(this.resetfontbtn);
             this.Controls.Add(this.fontSizeLabel);
             this.Controls.Add(this.fontPreviewTextBox);
@@ -324,5 +336,6 @@ namespace CS2FM
         private Label fontSizeLabel;
         private Button resetfontbtn;
         private Button autodetectbtn;
+        private Button previewfontbtn;
     }
 }

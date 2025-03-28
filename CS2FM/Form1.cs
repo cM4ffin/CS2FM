@@ -7,6 +7,10 @@ using System.Text;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace CS2FM
 {
@@ -369,8 +373,6 @@ namespace CS2FM
             return validExtensions.Contains(fileExtension);
         }
 
-
-
         //--[[---------------------------------------------------------
         //	Name: Move selected font list item.
         //	Desc: Moves the selected font in the list up or down.
@@ -412,19 +414,6 @@ namespace CS2FM
                 }
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         //--[[---------------------------------------------------------
         //	Name: Font-size slider.
@@ -515,8 +504,7 @@ namespace CS2FM
             }
         }
 
-
-        private void applyfontbtn_Click(object sender, EventArgs e)
+        private void applyFont(bool alert)
         {
             if (fontlist.SelectedItem == null)
             {
@@ -599,7 +587,9 @@ namespace CS2FM
                 string destinationPath = Path.Combine(gameDirectory, selectedFontFileName);
                 File.Copy(selectedFontPath, destinationPath, true);
 
-                MessageBox.Show("Font applied successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (alert) {
+                    MessageBox.Show("Font applied successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             catch (Exception ex)
             {
@@ -613,7 +603,7 @@ namespace CS2FM
         //  Adds "stratum2.uifont" back to the core directory.
         //-----------------------------------------------------------]]
 
-        private void resetfontbtn_Click(object sender, EventArgs e)
+        private void fontReset(bool alert)
         {
             try
             {
@@ -637,12 +627,176 @@ namespace CS2FM
                 // Copy the default stratum2 font to the game directory
                 File.WriteAllBytes(stratumFontPath, defaultStratumFontBytes);
 
-                MessageBox.Show("Font configuration has been reset to default.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (alert)
+                {
+                    MessageBox.Show("Font configuration has been reset to default.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"An error occurred while resetting the font configuration: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        //--[[---------------------------------------------------------
+        //	Name: Preview Font.
+        //	Desc: Copies the previous font to a temporary directory located in "game" and "core" paths.
+        //  Applies currently selected font (reuses applyFont() function).
+        //  Starts Counter Strike 2, using "steam://rungameid/730", and listens to the "cs2.exe" process.
+        //  Prevents the app from being used, hiding it.
+        //  On "cs2.exe" process termination, copies the files from the temporary directory back to the "game" and "core" paths.
+        //  The form becomes visible and usable again.
+        //-----------------------------------------------------------]]
+
+        private void previewFont()
+        {
+            if (Process.GetProcessesByName("cs2").Any())
+            {
+                MessageBox.Show("Counter Strike 2 is already running! Please close it and try again.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (fontlist.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a font from the list.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                string gameDirectory = gamepath.Text;
+                string coreDirectory = corepath.Text;
+
+                string fontsConfPath = Path.Combine(gameDirectory, "fonts.conf");
+                string replGlobalConfPath = Path.Combine(coreDirectory, "42-repl-global.conf");
+
+                string gameTempPath = Path.Combine(gameDirectory, "temp");
+                string coreTempPath = Path.Combine(coreDirectory, "temp");
+
+                string tempFontsConf = Path.Combine(gameTempPath, "fonts.conf");
+                string tempReplGlobalConf = Path.Combine(coreTempPath, "42-repl-global.conf");
+
+                if (!Directory.Exists(gameTempPath))
+                    Directory.CreateDirectory(gameTempPath);
+
+                if (!Directory.Exists(coreTempPath))
+                    Directory.CreateDirectory(coreTempPath);
+
+                if (File.Exists(fontsConfPath))
+                {
+                    string destinationFontsConf = tempFontsConf;
+
+                    if (File.Exists(destinationFontsConf))
+                    {
+                        File.Delete(destinationFontsConf);
+                    }
+
+                    File.Move(fontsConfPath, destinationFontsConf);
+                }
+
+                if (File.Exists(replGlobalConfPath))
+                {
+                    string destinationReplGlobalConf = tempReplGlobalConf;
+
+                    if (File.Exists(destinationReplGlobalConf))
+                    {
+                        File.Delete(destinationReplGlobalConf);
+                    }
+
+                    File.Move(replGlobalConfPath, destinationReplGlobalConf);
+                }
+
+                applyFont(false);
+
+                // logic for listening to the game
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "steam://rungameid/730",
+                    UseShellExecute = true
+                });
+
+                Process cs2Process = null;
+                while (cs2Process == null)
+                {
+                    cs2Process = Process.GetProcessesByName("cs2").FirstOrDefault();
+                    Thread.Sleep(1000);
+                }
+
+                this.Hide();
+
+                cs2Process.EnableRaisingEvents = true;
+                cs2Process.Exited += (sender, e) =>
+                {
+                    Console.WriteLine($"[LOG] CS2 closed at {DateTime.Now}");
+
+                    this.Show();
+                    this.Activate();
+
+                    if (File.Exists(Path.Combine(gameTempPath, "fonts.conf")))
+                    {
+
+                        if (File.Exists(fontsConfPath))
+                        {
+                            File.Delete(fontsConfPath);
+                        }
+
+                        File.Move(tempFontsConf, fontsConfPath);
+                    }
+
+                    if (File.Exists(Path.Combine(coreTempPath, "42-repl-global.conf")))
+                    {
+
+                        if (File.Exists(replGlobalConfPath))
+                        {
+                            File.Delete(replGlobalConfPath);
+                        }
+
+                        File.Move(tempReplGlobalConf, replGlobalConfPath);
+                    }
+                };
+
+                cs2Process.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while previewing the font: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+
+        private void applyfontbtn_Click(object sender, EventArgs e)
+        {
+            applyFont(true);
+        }
+
+        private void resetfontbtn_Click(object sender, EventArgs e)
+        {
+            fontReset(true);
+        }
+
+        private void previewfontbtn_Click(object sender, EventArgs e)
+        {
+            previewFont();
+        }
+
+        //--[[---------------------------------------------------------
+        //	Name: Non-printable character check.
+        //	Desc: Checks if the input for the Preview Text Box is printable or not.
+        //  Prevents weird unicode characters from appearing.
+        //-----------------------------------------------------------]]
+
+        private void fontPreviewTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (IsNonPrintableChar(e.KeyChar) && e.KeyChar != '\b' && e.KeyChar != '\r')
+            {
+                e.Handled = true;
+            }
+        }
+
+        private bool IsNonPrintableChar(char c)
+        {
+            return Char.IsControl(c) && c != '\b' && c != '\r' && c != '\n';
         }
     }
 }
