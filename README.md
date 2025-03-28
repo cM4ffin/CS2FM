@@ -33,7 +33,9 @@ Now close Counter Strike 2 if you have it running and launch it again. If everyt
 ## Check my other project(s):
 
 <div align=center>
+	<a href="https://cscfg.net/">
 	<img alt="CSCFG" src="https://github.com/swai-js/swai-js/blob/main/logo/cs2cfg_colored.png?raw=true">
 	<br>
-	<a href="https://cscfg.net/">CSCFG - Counter Strike 2: Config Maker</a>
+	<p>CSCFG - Counter Strike 2: Config Maker</p>
+	</a>
 </div>
